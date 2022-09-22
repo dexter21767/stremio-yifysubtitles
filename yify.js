@@ -55,4 +55,4 @@ async function subtitles(type, id, lang) {
 }
 
 
-module.exports = { subtitles };
+module.exports = subtitles;
