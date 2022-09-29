@@ -5,7 +5,15 @@ const path = require('path');
 const subtitles = require('./yify.js');
 const manifest = require("./manifest.json");
 const languages = require('./languages.json');
+const rateLimit = require('express-rate-limit');
 
+
+const limiter = rateLimit({
+	windowMs: 10 * 1000, // 15 minutes
+	max: 1, // Limit each IP to 30 requests per `window` (here, per 15 minutes)
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
 
 app.set('trust proxy', true)
 
@@ -62,5 +70,22 @@ app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
 	}
 })
 
+app.get('/:subtitles/:name/:language/:id/:episode?\.:extension?', limiter, (req, res) => {
+	console.log(req.params);
+	let { subtitles, name, language, id, episode, extension } = req.params;
+	try {
+		let path = `/${subtitles}/${name}/${language}/${id}`
+		res.setHeader('Cache-Control', 'max-age=86400, public');
+		res.setHeader('responseEncoding', 'null');
+		res.setHeader('Content-Type', 'arraybuffer/json');
+		console.log(path);
+		proxyStream(path, episode).then(response => {
+			res.send(response);
+		}).catch(err => { console.log(err) })
+	} catch (err) {
+		console.log(err)
+		return res.send("Couldn't get the subtitle.")
+	}
+});
 
 module.exports = app
