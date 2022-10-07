@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require('cors');
 const path = require('path');
-const subtitles = require('./yify.js');
+const Subtitles = require('./yify.js');
 const manifest = require("./manifest.json");
 const languages = require('./languages.json');
 const rateLimit = require('express-rate-limit');
@@ -50,42 +50,28 @@ app.get('/:configuration?/manifest.json', (_, res) => {
 	res.end();
 });
 
-app.get('/:configuration?/:resource/:type/:id/:extra?.json', (req, res) => {
+app.get('/:configuration?/:resource/:type/:id/:extra?.json', async (req, res) => {
 	res.setHeader('Cache-Control', 'max-age=86400, public');
 	res.setHeader('Content-Type', 'application/json');
-
+	var subtitles = [];
 	console.log(req.params);
 	const { configuration, resource, type, id } = req.params;
+	if (type == "movie"){
 	if (configuration !== "subtitles" && configuration) {
 		let lang = configuration;
 		if (languages[lang]) {
-			subtitles(type, id, lang).then(subtitles => {
-				//console.log('subtitles', subtitles)
-				res.send(JSON.stringify({ subtitles: subtitles }));
-				res.end();
+			subtitles = await Subtitles(type, id, lang).then(subtitles => {
+				return subtitles
+				console.log(subtitles)
 			}).catch(error => { console.error(error); res.end(); })
-		} else {
-			res.end();
-		}
+		} 
 	}
+	}
+	console.log(subtitles)
+	subtitles = subtitles ? JSON.stringify({ subtitles: subtitles }):JSON.stringify({ subtitles:{} })
+	res.send(subtitles);
+	res.end();
 })
 
-app.get('/:subtitles/:name/:language/:id/:episode?\.:extension?', limiter, (req, res) => {
-	console.log(req.params);
-	let { subtitles, name, language, id, episode, extension } = req.params;
-	try {
-		let path = `/${subtitles}/${name}/${language}/${id}`
-		res.setHeader('Cache-Control', 'max-age=86400, public');
-		res.setHeader('responseEncoding', 'null');
-		res.setHeader('Content-Type', 'arraybuffer/json');
-		console.log(path);
-		proxyStream(path, episode).then(response => {
-			res.send(response);
-		}).catch(err => { console.log(err) })
-	} catch (err) {
-		console.log(err)
-		return res.send("Couldn't get the subtitle.")
-	}
-});
 
 module.exports = app

@@ -23,12 +23,14 @@ async function subtitles(type, id, lang) {
                 SearchCache.set(id, subtitleslist);
             }
         }
-        if (subtitleslist[lang]) {
+        //console.log(subtitleslist)
+        if (subtitleslist && subtitleslist[lang]) {
             let subtitles = subtitleslist[lang];
             const subs = [];
             for (let i = 0; i < subtitles.length; i++) {
                 let value = subtitles[i];
                 if (value) {
+                    let sublink = value.url.replace('https://www.yifysubtitles.org','https://yifysubtitles.org')
                     let link = value.url.replace(config.BaseURL,'')
                     let referer = link.replace('.zip','')  
                     let options = `d=${encodeURIComponent(config.BaseURL)}&h=User-Agent:${encodeURIComponent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36')}`;
