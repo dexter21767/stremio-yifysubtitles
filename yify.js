@@ -4,10 +4,8 @@ require('dotenv').config();
 const languages = require('./languages.json');
 const count = 10;
 const NodeCache = require("node-cache");
-const Cache = new NodeCache();
-const filesCache = new NodeCache();
-const SearchCache = new NodeCache();
-const subsceneCache = new NodeCache();
+const Cache = new NodeCache({ stdTTL: (0.5 * 60 * 60), checkperiod: (1 * 60 * 60) });
+const SearchCache = new NodeCache({ stdTTL: (0.5 * 60 * 60), checkperiod: (1 * 60 * 60) });
 
 async function subtitles(type, id, lang) {
     const cachID = `${id}_${lang}`;
@@ -30,9 +28,9 @@ async function subtitles(type, id, lang) {
             for (let i = 0; i < subtitles.length; i++) {
                 let value = subtitles[i];
                 if (value) {
-                    let sublink = value.url.replace('https://www.yifysubtitles.org','https://yifysubtitles.org')
-                    let link = value.url.replace(config.BaseURL,'')
-                    let referer = link.replace('.zip','')  
+                    let sublink = value.url.replace('https://www.yifysubtitles.org', 'https://yifysubtitles.org')
+                    let link = value.url.replace(config.BaseURL, '')
+                    let referer = link.replace('.zip', '')
                     let options = `d=${encodeURIComponent(config.BaseURL)}&h=User-Agent:${encodeURIComponent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36')}`;
                     let url = `http://127.0.0.1:11470/proxy/${options}${link}`;
                     //https://www.yifysubtitles.org/subtitle/nope-2022-arabic-yify-443681.zip
@@ -43,7 +41,7 @@ async function subtitles(type, id, lang) {
                         url: `http://127.0.0.1:11470/subtitles.vtt?from=${encodeURIComponent(value.url)}`
                     });
                 }
-            } 
+            }
             //console.log('subs', subs);
             console.log("Cache keys", Cache.keys());
             //subs = subs.filter(Boolean);
