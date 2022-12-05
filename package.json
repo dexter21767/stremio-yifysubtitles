@@ -1,6 +1,6 @@
 {
 	"name": "stremio-yifysubtitles",
-	"version": "0.0.3",
+	"version": "0.0.2",
 	"description": "Addon for getting subtitles from yifysubtitles, by Dexter21767",
 	"scripts": {
 		"start": "node server.js",
