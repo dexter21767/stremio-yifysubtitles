@@ -50,12 +50,12 @@ app.get('/:configuration?/manifest.json', (_, res) => {
 	res.end();
 });
 
-app.get('/:configuration?/:resource/:type/:id/:extra?.json', async (req, res) => {
+app.get('/:configuration?/subtitles/:type/:id/:extra?.json', async (req, res) => {
 	res.setHeader('Cache-Control', 'max-age=86400, public');
 	res.setHeader('Content-Type', 'application/json');
 	var subtitles = [];
 	console.log(req.params);
-	const { configuration, resource, type, id } = req.params;
+	const { configuration, type, id } = req.params;
 	if (type == "movie"){
 	if (configuration !== "subtitles" && configuration) {
 		let lang = configuration;

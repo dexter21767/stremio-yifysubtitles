@@ -1,7 +1,7 @@
 var env = process.env.NODE_ENV ? 'beamup':'local';
 
 var config = {
-    BaseURL: "https://yifysubtitles.org"
+    BaseURL: "https://yifysubtitles.ch"
 }
 
 switch (env) {
